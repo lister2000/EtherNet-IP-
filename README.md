@@ -112,7 +112,7 @@ python VmTools.py
 
 VM 端即可立刻读取到最新数据。
 
-## 📦 技术实现原理
+## 📦 技术原理
 本项目在底层直接使用 Python socket 实现了 CIP 协议的核心部分：
 RegisterSession (0x65)：应答 VM 的握手请求，建立会话。
 SendRRData (0x6F)：封装显式报文的载体。
