@@ -1,10 +1,12 @@
+!密封胶路路径查找
+<img width="1079" height="538" alt="reame" src="https://github.com/lister2000/EtherNet-IP-/blob/master/%E7%95%8C%E9%9D%A2.png" />
+
 📦 VM EtherNet/IP Tag Simulator (PLC 模拟与标签管理工具)
 这是一个基于 Python + PyQt5 开发的轻量级 EtherNet/IP (CIP) 服务端（从站）模拟器。
 
 由于海康 VM（VisionMaster）在作为 EtherNet/IP 客户端（TcpClient）时，无法直接接收外部发来的写入（Write Tag），只能通过轮询读取（Read Tag）获取数据。本工具专门用于解决这一痛点，它可以模拟一个真实 PLC，让 VM 能够成功读取到指定标签的数据。同时，本工具也支持主动向 VM 发送写入请求。
 
 ✨ 核心特性
-🖥️ 现代 UI：采用类似 VS Code 的暗黑主题风格，扁平化设计，界面清爽直观。
 
 🔄 动态标签管理：支持在界面上实时创建、修改和删除标签（CRUD）。
 
@@ -46,7 +48,7 @@ python main.py
 
 通信方式选择 TcpClient，目标 IP 填 127.0.0.1，端口填 44818。
 
-配置你需要读取的标签（如 Stn05CameraHKVision.Trigger）。
+配置你需要读取的标签（如 CameraHKVision.Trigger）。
 
 标签配置：
 
@@ -55,17 +57,6 @@ python main.py
 双击表格中的“当前值”即可直接修改数据，按回车生效。
 
 VM 端即可立刻读取到最新数据。
-
-📦 如何打包为独立 EXE
-如果你需要在没有 Python 环境的工控机上运行，可以使用 PyInstaller 进行打包：
-
-bash
-# 安装打包工具
-pip install pyinstaller
-
-# 打包成单文件、无控制台黑框（隐去命令行）
-pyinstaller -F -w -n VM_TagManager main.py
-生成的 VM_TagManager.exe 会出现在 dist 文件夹中，直接双击即可运行。
 
 🧠 技术实现原理（CIP 协议解析）
 本项目在底层直接使用 Python socket 实现了 CIP 协议的核心部分：
@@ -84,12 +75,9 @@ CIP 路径解析：对于 A.B 形式的标签，代码会将其自动拆分为�
 VM 端显示数据不对，出现 [01][00][02][00] 等多余前缀：
 这是因为 VM 端在配置设备管理时，预留了槽号（Slot）或字节长度导致的。建议将 VM 设备管理中的“字节长度”改为与实际数据长度一致（如 INT16 填 2），或者在工具里调整返回的字节组装顺序。
 
-打包后的 EXE 被杀毒软件报毒：
-PyInstaller 加壳机制导致，属于误报。可将 EXE 添加至白名单，或使用普通文件夹打包模式（去掉 -F 参数）。
-
 端口 44818 被占用：
 可能电脑上运行了 RSLinx、FactoryTalk 等罗克韦尔软件，请关闭它们或更改本程序的监听端口。
 
 📄 开源协议
-本项目基于 MIT License 开源，可自由用于个人学习或商业测试环境。请勿用于对安全要求极高的实际生产控制现场。
+本项目基于 MIT License 开源，可自由用于个人学习或商业测试环境。
 
