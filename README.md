@@ -1,6 +1,20 @@
-回顾我们这次从“连不上”到“彻底掌控”的完整历程，中间踩过了非常多工业通信和 Python 编程的坑。把这些经验总结下来，对以后做类似的工控对接会非常有帮助。
+# 📘 工业通信实战经验：VM EtherNet/IP & CIP 协议对接避坑指南
 
-#一、 协议层经验（EtherNet/IP & CIP）
+[![GitHub stars](https://img.shields.io/github/stars/lister2000/myacademy?style=social)](https://github.com/lister2000/myacademy/stargazers)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/lister2000/myacademy)](https://github.com/lister2000/myacademy/commits/master)
+
+> 🚀 回顾我们这次从“连不上”到“彻底掌控”的完整历程，中间踩过了非常多工业通信和 Python 编程的坑。把这些经验总结下来，对以后做类似的工控对接会非常有帮助。
+
+---
+
+---
+
+## ✨ 📖项目经验
+
+本文档总结了在使用海康 VM（VisionMaster）作为 EtherNet/IP 客户端（TcpClient），并使用 Python 模拟 PLC 服务端（Adapter）进行双向通信时，所积累的底层协议原理、调试技巧与开发经验。
+
+一、 协议层经验（EtherNet/IP & CIP）
 TCP 连通 ≠ 协议连通
 即使 TCP 三次握手成功，VM 发来 RegisterSession，也不代表真正建立通信。这只是“敲门”，如果不回 RegisterSession 的成功响应，VM 会一直重试并最终断开。
 
@@ -32,7 +46,7 @@ REAL 对应类型码 0x00CA，长度 4 字节（IEEE 754 浮点数）。
 解析响应必须“随波逐流”
 你最初想主动发 Write Tag 让 VM 更新，但 VM 的配置是“轮询读取”，它根本不看写入报文。它只看你回复读请求时的数据是什么。 所以，“改了不生效”的根本原因是我们只改了下发报文，没改内存字典里用于回复读取请求的值。
 
-#二、 软件与 UI 层经验（PyQt5）
+二、 软件与 UI 层经验（PyQt5）
 表格数据的“提交”时机
 在 PyQt5 的 QTableWidget 里，用户双击单元格输入内容后，必须按回车或点击其他单元格，数据才会提交并触发 itemChanged 信号。如果不提醒用户，他们改完直接去点发送，程序拿到的还是旧值。
 
@@ -41,17 +55,13 @@ REAL 对应类型码 0x00CA，长度 4 字节（IEEE 754 浮点数）。
 
 线程与 UI 的安全交互
 网络接收是在子线程中进行的。所有的界面更新（追加文本、弹窗）都必须通过 pyqtSignal 发回主线程，否则程序会崩溃或报 QTextCursor 之类的警告。
+---
 
-#三、 打包与部署经验
-PyInstaller 单文件打包：
+## 📦 调试排查
 
-bash
-pyinstaller -F -w -n 软件名 你的代码.py
--F 打包单文件，-w 隐藏黑框，-n 指定名字。打包出的 .exe 会被杀毒软件误报，建议添加信任或分发时说明。
+1、端口冲突：如果 44818 被 RSLinx 等软件占用，需要修改监听端口，同时 VM 里的目标端口也要同步改。
 
-端口冲突：如果 44818 被 RSLinx 等软件占用，需要修改监听端口，同时 VM 里的目标端口也要同步改。
-
-#四、 调试排查的终极手段
+2、 调试排查的终极手段
 抓包（Wireshark / pktmon）
 当“猜不出”对方发了什么时，唯一的真理就是抓包。看 VM 发来的十六进制数据，能瞬间定位服务码、长度、路径解析是否正确。
 
@@ -61,8 +71,8 @@ pyinstaller -F -w -n 软件名 你的代码.py
 “不管三七二十一”的回包法
 在协议解析还不完美时（比如搞不清路径解析细节），最有效的测试手段就是：只要收到请求，直接构造一个可能对的响应发回去。只要能通一次，再顺藤摸瓜修补细节。
 
-#五、 最终达成的架构能力
-你现在手上的这个工具，已经是一个轻量级的 CIP PLC 模拟器。它具备：
+## 📖 特性
+你现在手上的这个工具是模拟器具备：
 
 自定义标签库（支持单级和多级路径）。
 
@@ -76,8 +86,7 @@ pyinstaller -F -w -n 软件名 你的代码.py
 
 这套代码和其中的逻辑，不仅能用来模拟这个相机标签，以后如果遇到任何上位机（SCADA、MES）或者 PLC 的 EtherNet/IP 对接，都能直接复用！
 
-!EtherNet-IP for VM
-<img width="1079" height="538" alt="reame" src="https://github.com/lister2000/EtherNet-IP-/blob/master/%E7%95%8C%E9%9D%A2.png" />
+
 
 📦 VM EtherNet/IP Tag Simulator (PLC 模拟与标签管理工具)
 这是一个基于 Python + PyQt5 开发的轻量级 EtherNet/IP (CIP) 服务端（从站）模拟器。
