@@ -1,15 +1,5 @@
 # 工业通信实战经验：VM EtherNet/IP & CIP 协议对接避坑指南📘 
 
-VM EtherNet/IP Tag Simulator (PLC 模拟与标签管理工具)
-这是一个基于 Python + PyQt5 开发的轻量级 EtherNet/IP (CIP) 服务端（从站）模拟器。
-你现在手上的这个工具是模拟器具备：
-自定义标签库（支持单级和多级路径）。
-多数据类型支持（INT/DINT/REAL）。
-动态增删改查（界面直观管理）。
-双工通信（能正确回复 VM 的轮询读取，也能主动向 VM 发起写入）。
-可视化日志（所有收发报文一目了然）。
-这套代码和其中的逻辑，不仅能用来模拟这个相机标签，以后如果遇到任何上位机（SCADA、MES）或者 PLC 的 EtherNet/IP 对接，都能直接复用！
-
 [![GitHub stars](https://img.shields.io/github/stars/lister2000/EtherNet-IP-?style=social)](https://github.com/lister2000/EtherNet-IP-/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/lister2000/EtherNet-IP-?style=social)](https://github.com/lister2000/EtherNet-IP-/network/members)
 [![GitHub last commit](https://img.shields.io/github/last-commit/lister2000/EtherNet-IP-)](https://github.com/lister2000/EtherNet-IP-/commits/master)
@@ -20,11 +10,14 @@ VM EtherNet/IP Tag Simulator (PLC 模拟与标签管理工具)
 
 > 🚀 回顾这次从“连不上”到“彻底掌控”的完整历程，中间踩过了非常多工业通信和 Python 编程的坑。把这些经验总结下来，对做类似的工控对接会非常有帮助。
 由于海康 VM（VisionMaster）在作为 EtherNet/IP 客户端（TcpClient）时，无法直接接收外部发来的写入（Write Tag），只能通过轮询读取（Read Tag）获取数据。本工具专门用于解决这一痛点，它可以模拟一个真实 PLC，让 VM 能够成功读取到指定标签的数据。同时，本工具也支持主动向 VM 发送写入请求。
+VM EtherNet/IP Tag Simulator (PLC 模拟与标签管理工具)这是一个基于 Python + PyQt5 开发的轻量级 EtherNet/IP (CIP) 服务端（从站）模拟器。
+这套代码和其中的逻辑，不仅能用来模拟这个相机标签，以后如果遇到任何上位机（SCADA、MES）或者 PLC 的 EtherNet/IP 对接，都能直接复用！
 
 ## 📖 目录导航
 
 - [📖项目经验](#-项目经验)
-
+- [📖快速安装](#-快速安装)
+- [📖技术原理](#-技术原理)
 ---
 
 ## 🧩 一、项目经验
@@ -118,18 +111,14 @@ python VmTools.py
 
 VM 端即可立刻读取到最新数据。
 
-📦 技术实现原理（CIP 协议解析）
+## 📦 四、技术实现原理（CIP 协议解析）
 本项目在底层直接使用 Python socket 实现了 CIP 协议的核心部分：
-
 RegisterSession (0x65)：应答 VM 的握手请求，建立会话。
-
 SendRRData (0x6F)：封装显式报文的载体。
-
 Read Tag (0x4C / 0x52)：解析 VM 发来的路径段，提取标签名并打包对应数据类型的响应。
-
 Write Tag (0x4D)：支持主动下发。
-
 CIP 路径解析：对于 A.B 形式的标签，代码会将其自动拆分为两个 0x91 符号段（ANSI Extended Symbol Segment），并自动补齐偶数长度（\x00）。
+
 
 ⚠️ 常见问题
 VM 端显示数据不对，出现 [01][00][02][00] 等多余前缀：
