@@ -1,5 +1,4 @@
 # 工业通信实战经验：VM EtherNet/IP & CIP 协议对接避坑指南📘 
-
 <img width="1079" height="538" alt="reame" src="https://github.com/lister2000/EtherNet-IP-/blob/master/Images/wellcome.jpg" />
 
 [![GitHub stars](https://img.shields.io/github/stars/lister2000/EtherNet-IP-?style=social)](https://github.com/lister2000/EtherNet-IP-/stargazers)
